@@ -2,7 +2,7 @@ name: جمع روابط تلجرام
 
 on:
   schedule:
-    # تشغيل كل دقيقة
+    # كل دقيقة
     - cron: '*/1 * * * *'
   workflow_dispatch:
 
@@ -23,6 +23,14 @@ jobs:
       run: |
         pip install telethon requests
     
+    - name: استرجاع الجلسة السابقة
+      uses: actions/cache@v3
+      with:
+        path: session.txt
+        key: telegram-session-${{ github.run_id }}
+        restore-keys: |
+          telegram-session-
+    
     - name: تشغيل المجمع
       env:
         API_ID: ${{ secrets.API_ID }}
@@ -30,5 +38,11 @@ jobs:
         PHONE: ${{ secrets.PHONE }}
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         CHAT_ID: ${{ secrets.CHAT_ID }}
-        CHANNEL: ${{ secrets.CHANNEL }}
+        CHANNEL: ${{ secrets.CHANNEL }}  # يدعم كل الأشكال!
       run: python collector.py
+    
+    - name: حفظ الجلسة للمرة القادمة
+      uses: actions/cache@v3
+      with:
+        path: session.txt
+        key: telegram-session-${{ github.run_id }}
