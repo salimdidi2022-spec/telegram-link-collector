@@ -8,6 +8,7 @@ on:
 jobs:
   collect:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v3
     
@@ -16,6 +17,15 @@ jobs:
         python-version: '3.10'
     
     - run: pip install telethon requests
+    
+    # استرجاع قاعدة البيانات المحفوظة
+    - name: استرجاع الروابط المحفوظة
+      uses: actions/cache@v3
+      with:
+        path: sent_links.json
+        key: links-db-${{ github.run_id }}
+        restore-keys: |
+          links-db-
     
     - name: تشغيل المجمع
       env:
@@ -26,3 +36,10 @@ jobs:
         CHAT_ID: ${{ secrets.CHAT_ID }}
         CHANNEL: ${{ secrets.CHANNEL }}
       run: python collector.py
+    
+    # حفظ قاعدة البيانات للمرة القادمة
+    - name: حفظ الروابط
+      uses: actions/cache@v3
+      with:
+        path: sent_links.json
+        key: links-db-${{ github.run_id }}
