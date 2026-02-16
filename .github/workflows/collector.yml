@@ -2,7 +2,7 @@ name: جمع روابط متعددة
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # كل 5 دقائق (أفضل لعدة قنوات)
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
         SESSION_STRING: ${{ secrets.SESSION_STRING }}
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         CHAT_ID: ${{ secrets.CHAT_ID }}
-        CHANNELS: ${{ secrets.CHANNELS }}  # ← تغير من CHANNEL إلى CHANNELS
+        CHANNELS: ${{ secrets.CHANNELS }}
       run: python collector.py
     
     - name: حفظ الروابط
