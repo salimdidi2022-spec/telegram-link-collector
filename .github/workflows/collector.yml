@@ -1,48 +1,28 @@
-name: جمع روابط تلجرام
+name: جمع الروابط
 
 on:
   schedule:
-    # كل دقيقة
     - cron: '*/1 * * * *'
   workflow_dispatch:
 
 jobs:
   collect:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: سحب الكود
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
     
-    - name: تثبيت Python
-      uses: actions/setup-python@v4
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.10'
     
-    - name: تثبيت المكتبات
-      run: |
-        pip install telethon requests
-    
-    - name: استرجاع الجلسة السابقة
-      uses: actions/cache@v3
-      with:
-        path: session.txt
-        key: telegram-session-${{ github.run_id }}
-        restore-keys: |
-          telegram-session-
+    - run: pip install telethon requests
     
     - name: تشغيل المجمع
       env:
         API_ID: ${{ secrets.API_ID }}
         API_HASH: ${{ secrets.API_HASH }}
-        PHONE: ${{ secrets.PHONE }}
+        SESSION_STRING: ${{ secrets.SESSION_STRING }}
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         CHAT_ID: ${{ secrets.CHAT_ID }}
-        CHANNEL: ${{ secrets.CHANNEL }}  # يدعم كل الأشكال!
+        CHANNEL: ${{ secrets.CHANNEL }}
       run: python collector.py
-    
-    - name: حفظ الجلسة للمرة القادمة
-      uses: actions/cache@v3
-      with:
-        path: session.txt
-        key: telegram-session-${{ github.run_id }}
