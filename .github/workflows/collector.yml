@@ -1,8 +1,8 @@
-name: جمع روابط متعددة
+name: جمع روابط تلجرام
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # كل 10 دقائق (أفضل للـ API)
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -26,9 +26,8 @@ jobs:
       uses: actions/cache@v3
       with:
         path: sent_links.json
-        key: links-db-${{ github.run_id }}
-        restore-keys: |
-          links-db-
+        key: db-${{ github.run_id }}
+        restore-keys: db-
     
     - name: تشغيل المجمع
       env:
@@ -42,19 +41,19 @@ jobs:
         ALI_APP_SECRET: ${{ secrets.ALI_APP_SECRET }}
         ALI_TRACKING_ID: ${{ secrets.ALI_TRACKING_ID }}
       run: |
-        echo "بدء الجمع..."
-        python collector.py
+        echo "=== بدء التشغيل ==="
+        python collector.py 2>&1
+        echo "=== انتهى التشغيل ==="
     
     - name: حفظ قاعدة البيانات
+      if: always()
       uses: actions/cache@v3
       with:
         path: sent_links.json
-        key: links-db-${{ github.run_id }}
+        key: db-${{ github.run_id }}
     
-    - name: عرض الإحصائيات
+    - name: عرض السجلات
       if: always()
       run: |
-        if [ -f sent_links.json ]; then
-          echo "📊 عدد الروابط المحفوظة:"
-          cat sent_links.json | python -c "import json,sys; data=json.load(sys.stdin); print(len(data))"
-        fi
+        echo "=== آخر 50 سطر من السجلات ==="
+        # السجلات تظهر تلقائياً في خطوة التشغيل
