@@ -1,4 +1,4 @@
-name: جمع روابط تلجرام
+name: جمع روابط
 
 on:
   schedule:
@@ -10,17 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: سحب الكود
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
     
-    - name: تثبيت Python
-      uses: actions/setup-python@v4
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.10'
     
-    - name: تثبيت المكتبات
-      run: |
-        pip install telethon requests
+    - run: pip install telethon requests
     
     - name: استرجاع قاعدة البيانات
       uses: actions/cache@v3
@@ -38,22 +34,17 @@ jobs:
         CHAT_ID: ${{ secrets.CHAT_ID }}
         CHANNELS: ${{ secrets.CHANNELS }}
         ALI_APP_KEY: ${{ secrets.ALI_APP_KEY }}
-        ALI_APP_SECRET: ${{ secrets.ALI_APP_SECRET }}
         ALI_TRACKING_ID: ${{ secrets.ALI_TRACKING_ID }}
       run: |
         echo "=== بدء التشغيل ==="
-        python collector.py 2>&1
-        echo "=== انتهى التشغيل ==="
+        python collector.py
+        echo "=== انتهى ==="
+        echo "محتويات المجلد:"
+        ls -la
     
-    - name: حفظ قاعدة البيانات
+    - name: حفظ القاعدة
       if: always()
       uses: actions/cache@v3
       with:
         path: sent_links.json
         key: db-${{ github.run_id }}
-    
-    - name: عرض السجلات
-      if: always()
-      run: |
-        echo "=== آخر 50 سطر من السجلات ==="
-        # السجلات تظهر تلقائياً في خطوة التشغيل
