@@ -2,7 +2,7 @@ name: جمع روابط متعددة
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/10 * * * *'  # كل 10 دقائق (أفضل للـ API)
   workflow_dispatch:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
       run: |
         pip install telethon requests
     
-    - name: استرجاع الروابط المحفوظة
+    - name: استرجاع قاعدة البيانات
       uses: actions/cache@v3
       with:
         path: sent_links.json
@@ -41,10 +41,20 @@ jobs:
         ALI_APP_KEY: ${{ secrets.ALI_APP_KEY }}
         ALI_APP_SECRET: ${{ secrets.ALI_APP_SECRET }}
         ALI_TRACKING_ID: ${{ secrets.ALI_TRACKING_ID }}
-      run: python collector.py
+      run: |
+        echo "بدء الجمع..."
+        python collector.py
     
-    - name: حفظ الروابط
+    - name: حفظ قاعدة البيانات
       uses: actions/cache@v3
       with:
         path: sent_links.json
         key: links-db-${{ github.run_id }}
+    
+    - name: عرض الإحصائيات
+      if: always()
+      run: |
+        if [ -f sent_links.json ]; then
+          echo "📊 عدد الروابط المحفوظة:"
+          cat sent_links.json | python -c "import json,sys; data=json.load(sys.stdin); print(len(data))"
+        fi
