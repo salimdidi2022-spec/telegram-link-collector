@@ -1,14 +1,14 @@
-name: نسخ منشورات مع أفلييت
+name: نسخ منشورات مع صور
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # كل 10 دقائق
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20  # زيادة الوقت للصور
     
     steps:
     - name: سحب الكود
@@ -26,9 +26,15 @@ jobs:
     - name: استرجاع قاعدة البيانات
       uses: actions/cache@v3
       with:
-        path: sent_links.json
-        key: db-${{ github.run_id }}
-        restore-keys: db-
+        path: |
+          sent_links.json
+          photos/
+        key: db-photos-${{ github.run_id }}
+        restore-keys: |
+          db-photos-
+    
+    - name: إنشاء مجلد الصور
+      run: mkdir -p photos
     
     - name: تشغيل الناسخ
       env:
@@ -45,13 +51,14 @@ jobs:
         python collector.py
         echo ""
         echo "=== انتهى ==="
-        echo "الحالة:"
-        ls -la
-        cat sent_links.json 2>/dev/null | wc -l
+        echo "الملفات:"
+        ls -la photos/ 2>/dev/null || echo "لا يوجد صور"
     
-    - name: حفظ قاعدة البيانات
+    - name: حفظ البيانات
       if: always()
       uses: actions/cache@v3
       with:
-        path: sent_links.json
-        key: db-${{ github.run_id }}
+        path: |
+          sent_links.json
+          photos/
+        key: db-photos-${{ github.run_id }}
